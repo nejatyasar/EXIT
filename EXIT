@@ -1,0 +1,332 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  stor0 is array of struct at storage 0
+  stor1 is array of struct at storage 1
+  totalSupply is uint256 at storage 2
+  decimals is uint256 at storage 3
+  cap is uint256 at storage 4
+  balanceOf is mapping of uint256 at storage 5
+  allowance is mapping of uint256 at storage 6
+  owner is addr at storage 7
+  stor8 is addr at storage 8
+  unlockTime is uint256 at storage 9
+  unknown9004a8bb is uint8 at storage 10
+
+def totalSupply() payable: 
+  return totalSupply
+
+def decimals() payable: 
+  return decimals
+
+def cap() payable: 
+  return cap
+
+def getUnlockTime() payable: 
+  return unlockTime
+
+def balanceOf(address _owner) payable: 
+  require calldata.size - 4 >=ΓÇ▓ 32
+  require _owner == _owner
+  return balanceOf[addr(_owner)]
+
+def owner() payable: 
+  return owner
+
+def unknown9004a8bb() payable: 
+  return bool(unknown9004a8bb)
+
+def allowance(address _owner, address _spender) payable: 
+  require calldata.size - 4 >=ΓÇ▓ 64
+  require _owner == _owner
+  require _spender == _spender
+  return allowance[addr(_owner)][addr(_spender)]
+
+#
+#  Regular functions
+#
+
+def _fallback() payable: # default function
+  revert
+
+def renounceOwnership() payable: 
+  if owner != caller:
+      revert with 0, 'Only owner can do this!'
+  owner = 0
+  stor8 = 0
+  unknown9004a8bb = 1
+  log 0xfe8be007 
+  log 0x0 
+  log 0x0 
+
+def unknown717d0cb0() payable: 
+  if stor8 != caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'You don't have permission to unlock ownership'
+  if block.timestamp <= unlockTime:
+      revert with 0, 'Ownership is still locked'
+  owner = stor8
+  log 0xfe8be007: stor8, stor8
+
+def lockOwnership(uint256 _param1) payable: 
+  require calldata.size - 4 >=ΓÇ▓ 32
+  if owner != caller:
+      revert with 0, 'Only owner can do this!'
+  stor8 = owner
+  owner = 0
+  if block.timestamp > _param1 + block.timestamp:
+      revert with 0, 17
+  unlockTime = _param1 + block.timestamp
+  log 0xfe8be007: stor8, 0
+
+def approve(address _spender, uint256 _value) payable: 
+  require calldata.size - 4 >=ΓÇ▓ 64
+  require _spender == _spender
+  allowance[caller][addr(_spender)] = _value
+  log Approval(
+        address tokenOwner=_value,
+        address spender=caller,
+        uint256 tokens=_spender)
+  return 1
+
+def transferOwnership(address _newOwner) payable: 
+  require calldata.size - 4 >=ΓÇ▓ 32
+  require _newOwner == _newOwner
+  if owner != caller:
+      revert with 0, 'Only owner can do this!'
+  if not _newOwner:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  'New owner can't be zero address. If you still want to do this use renounceOwnership function.'
+  owner = _newOwner
+  stor8 = _newOwner
+  log 0xfe8be007: _newOwner, _newOwner
+
+def burn(uint256 _value) payable: 
+  require calldata.size - 4 >=ΓÇ▓ 32
+  if _value > balanceOf[caller]:
+      revert with 0, 'Balance is too low'
+  if totalSupply - _value > totalSupply:
+      revert with 0, 17
+  totalSupply -= _value
+  if balanceOf[caller] - _value > balanceOf[caller]:
+      revert with 0, 17
+  balanceOf[caller] -= _value
+  log 0xe0ddf252: _value, caller, 0
+
+def transfer(address _to, uint256 _value) payable: 
+  require calldata.size - 4 >=ΓÇ▓ 64
+  require _to == _to
+  if _value > balanceOf[caller]:
+      revert with 0, 'Balance is too low'
+  if balanceOf[caller] - _value > balanceOf[caller]:
+      revert with 0, 17
+  balanceOf[caller] -= _value
+  if balanceOf[addr(_to)] > _value + balanceOf[addr(_to)]:
+      revert with 0, 17
+  balanceOf[addr(_to)] += _value
+  log 0xe0ddf252: _value, caller, _to
+  return 1
+
+def mint(address _to, uint256 _amount) payable: 
+  require calldata.size - 4 >=ΓÇ▓ 64
+  require _to == _to
+  if owner != caller:
+      revert with 0, 'Only owner can do this!'
+  if not _to:
+      revert with 0, 'Don't mint to zero address!'
+  if totalSupply > _amount + totalSupply:
+      revert with 0, 17
+  if _amount + totalSupply > cap:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Total supply can't be more than cap!'
+  if totalSupply > _amount + totalSupply:
+      revert with 0, 17
+  totalSupply += _amount
+  if balanceOf[addr(_to)] > _amount + balanceOf[addr(_to)]:
+      revert with 0, 17
+  balanceOf[addr(_to)] += _amount
+  log 0xe0ddf252: _amount, 0, _to
+
+def burnFrom(address _from, uint256 _value) payable: 
+  require calldata.size - 4 >=ΓÇ▓ 64
+  require _from == _from
+  if _value > balanceOf[addr(_from)]:
+      revert with 0, 'Balance is too low'
+  if _value > allowance[addr(_from)][caller]:
+      revert with 0, 'Allowance is too low'
+  if totalSupply - _value > totalSupply:
+      revert with 0, 17
+  totalSupply -= _value
+  if balanceOf[addr(_from)] - _value > balanceOf[addr(_from)]:
+      revert with 0, 17
+  balanceOf[addr(_from)] -= _value
+  if allowance[addr(_from)][caller] - _value > allowance[addr(_from)][caller]:
+      revert with 0, 17
+  allowance[addr(_from)][caller] -= _value
+  log 0xe0ddf252: _value, _from, 0
+
+def transferFrom(address _from, address _to, uint256 _value) payable: 
+  require calldata.size - 4 >=ΓÇ▓ 96
+  require _from == _from
+  require _to == _to
+  if _value > balanceOf[addr(_from)]:
+      revert with 0, 'Balance is too low'
+  if _value > allowance[addr(_from)][caller]:
+      revert with 0, 'Allowance is too low'
+  if balanceOf[addr(_from)] - _value > balanceOf[addr(_from)]:
+      revert with 0, 17
+  balanceOf[addr(_from)] -= _value
+  if allowance[addr(_from)][caller] - _value > allowance[addr(_from)][caller]:
+      revert with 0, 17
+  allowance[addr(_from)][caller] -= _value
+  if balanceOf[addr(_to)] > _value + balanceOf[addr(_to)]:
+      revert with 0, 17
+  balanceOf[addr(_to)] += _value
+  log 0xe0ddf252: _value, _from, _to
+  return 1
+
+def name() payable: 
+  if bool(stor0.length):
+      if not bool(stor0.length) - (uint255(stor0.length) * 0.5 < 32):
+          revert with 0, 34
+      if bool(stor0.length):
+          if not bool(stor0.length) - (uint255(stor0.length) * 0.5 < 32):
+              revert with 0, 34
+          if Mask(256, -1, stor0.length):
+              if 31 < uint255(stor0.length) * 0.5:
+                  mem[128] = uint256(stor0.field_0)
+                  idx = 128
+                  s = 0
+                  while (uint255(stor0.length) * 0.5) + 96 > idx:
+                      mem[idx + 32] = stor0[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor0.length), data=mem[128 len ceil32(uint255(stor0.length) * 0.5)])
+              mem[128] = 256 * stor0.length.field_8
+      else:
+          if not bool(stor0.length) - (stor0.length.field_1 < 32):
+              revert with 0, 34
+          if stor0.length.field_1:
+              if 31 < stor0.length.field_1:
+                  mem[128] = uint256(stor0.field_0)
+                  idx = 128
+                  s = 0
+                  while stor0.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor0[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor0.length), data=mem[128 len ceil32(uint255(stor0.length) * 0.5)])
+              mem[128] = 256 * stor0.length.field_8
+      mem[ceil32(uint255(stor0.length) * 0.5) + 192 len ceil32(uint255(stor0.length) * 0.5)] = mem[128 len ceil32(uint255(stor0.length) * 0.5)]
+      mem[ceil32(uint255(stor0.length) * 0.5) + (uint255(stor0.length) * 0.5) + 192] = 0
+      return Array(len=2 * Mask(256, -1, stor0.length), data=mem[128 len ceil32(uint255(stor0.length) * 0.5)], mem[(2 * ceil32(uint255(stor0.length) * 0.5)) + 192 len 2 * ceil32(uint255(stor0.length) * 0.5)]), 
+  if not bool(stor0.length) - (stor0.length.field_1 < 32):
+      revert with 0, 34
+  if bool(stor0.length):
+      if not bool(stor0.length) - (uint255(stor0.length) * 0.5 < 32):
+          revert with 0, 34
+      if Mask(256, -1, stor0.length):
+          if 31 < uint255(stor0.length) * 0.5:
+              mem[128] = uint256(stor0.field_0)
+              idx = 128
+              s = 0
+              while (uint255(stor0.length) * 0.5) + 96 > idx:
+                  mem[idx + 32] = stor0[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor0.length % 128, data=mem[128 len ceil32(stor0.length.field_1)])
+          mem[128] = 256 * stor0.length.field_8
+  else:
+      if not bool(stor0.length) - (stor0.length.field_1 < 32):
+          revert with 0, 34
+      if stor0.length.field_1:
+          if 31 < stor0.length.field_1:
+              mem[128] = uint256(stor0.field_0)
+              idx = 128
+              s = 0
+              while stor0.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor0[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor0.length % 128, data=mem[128 len ceil32(stor0.length.field_1)])
+          mem[128] = 256 * stor0.length.field_8
+  mem[ceil32(stor0.length.field_1) + 192 len ceil32(stor0.length.field_1)] = mem[128 len ceil32(stor0.length.field_1)]
+  mem[ceil32(stor0.length.field_1) + stor0.length.field_1 + 192] = 0
+  return Array(len=stor0.length % 128, data=mem[128 len ceil32(stor0.length.field_1)], mem[(2 * ceil32(stor0.length.field_1)) + 192 len 2 * ceil32(stor0.length.field_1)]), 
+
+def symbol() payable: 
+  if bool(stor1.length):
+      if not bool(stor1.length) - (uint255(stor1.length) * 0.5 < 32):
+          revert with 0, 34
+      if bool(stor1.length):
+          if not bool(stor1.length) - (uint255(stor1.length) * 0.5 < 32):
+              revert with 0, 34
+          if Mask(256, -1, stor1.length):
+              if 31 < uint255(stor1.length) * 0.5:
+                  mem[128] = uint256(stor1.field_0)
+                  idx = 128
+                  s = 0
+                  while (uint255(stor1.length) * 0.5) + 96 > idx:
+                      mem[idx + 32] = stor1[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor1.length), data=mem[128 len ceil32(uint255(stor1.length) * 0.5)])
+              mem[128] = 256 * stor1.length.field_8
+      else:
+          if not bool(stor1.length) - (stor1.length.field_1 < 32):
+              revert with 0, 34
+          if stor1.length.field_1:
+              if 31 < stor1.length.field_1:
+                  mem[128] = uint256(stor1.field_0)
+                  idx = 128
+                  s = 0
+                  while stor1.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor1[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor1.length), data=mem[128 len ceil32(uint255(stor1.length) * 0.5)])
+              mem[128] = 256 * stor1.length.field_8
+      mem[ceil32(uint255(stor1.length) * 0.5) + 192 len ceil32(uint255(stor1.length) * 0.5)] = mem[128 len ceil32(uint255(stor1.length) * 0.5)]
+      mem[ceil32(uint255(stor1.length) * 0.5) + (uint255(stor1.length) * 0.5) + 192] = 0
+      return Array(len=2 * Mask(256, -1, stor1.length), data=mem[128 len ceil32(uint255(stor1.length) * 0.5)], mem[(2 * ceil32(uint255(stor1.length) * 0.5)) + 192 len 2 * ceil32(uint255(stor1.length) * 0.5)]), 
+  if not bool(stor1.length) - (stor1.length.field_1 < 32):
+      revert with 0, 34
+  if bool(stor1.length):
+      if not bool(stor1.length) - (uint255(stor1.length) * 0.5 < 32):
+          revert with 0, 34
+      if Mask(256, -1, stor1.length):
+          if 31 < uint255(stor1.length) * 0.5:
+              mem[128] = uint256(stor1.field_0)
+              idx = 128
+              s = 0
+              while (uint255(stor1.length) * 0.5) + 96 > idx:
+                  mem[idx + 32] = stor1[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor1.length % 128, data=mem[128 len ceil32(stor1.length.field_1)])
+          mem[128] = 256 * stor1.length.field_8
+  else:
+      if not bool(stor1.length) - (stor1.length.field_1 < 32):
+          revert with 0, 34
+      if stor1.length.field_1:
+          if 31 < stor1.length.field_1:
+              mem[128] = uint256(stor1.field_0)
+              idx = 128
+              s = 0
+              while stor1.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor1[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor1.length % 128, data=mem[128 len ceil32(stor1.length.field_1)])
+          mem[128] = 256 * stor1.length.field_8
+  mem[ceil32(stor1.length.field_1) + 192 len ceil32(stor1.length.field_1)] = mem[128 len ceil32(stor1.length.field_1)]
+  mem[ceil32(stor1.length.field_1) + stor1.length.field_1 + 192] = 0
+  return Array(len=stor1.length % 128, data=mem[128 len ceil32(stor1.length.field_1)], mem[(2 * ceil32(stor1.length.field_1)) + 192 len 2 * ceil32(stor1.length.field_1)]), 
+
+
